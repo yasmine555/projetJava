@@ -35,20 +35,16 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
-
     @FXML
-    private void handleLogin(ActionEvent event) throws IOException {
+    private void handleLogin() throws IOException {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        Personnel loggedInPersonnel = findPersonnelByUsername(username);
-
-        if (loggedInPersonnel != null && loggedInPersonnel.checkPassword(password)) {
-            System.out.println("Authentication successful for " + loggedInPersonnel.getFirstName() + " " + loggedInPersonnel.getLastName());
+        if (username.equals("admin") && password.equals("admin")) {
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            //App.showListeMater(stage);
+            App.showListeMater(stage);
         } else {
-            System.out.println("Authentication failed. Please check your credentials.");
+            System.out.println("Identifiants incorrects. Veuillez réessayer.");
         }
     }
 

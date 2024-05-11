@@ -15,7 +15,7 @@
             </columns>
         </TableView>
         <TextField fx:id="searchField" layoutX="50.0" layoutY="360.0" prefHeight="25.0" prefWidth="270.0" promptText="Search Material..." />
-        <Button fx:id="newMaterialButton" layoutX="360.0" layoutY="360.0" onAction="#handleNewMaterial" text="New Material" />
+        <Button fx:id="newMaterialButton" layoutX="334.0" layoutY="360.0" onAction="#handleNewMaterial" text="New Material" />
         <Button fx:id="deleteButton" layoutX="440.0" layoutY="360.0" onAction="#handleDelete" text="Delete" />
         <Button fx:id="modifyButton" layoutX="500.0" layoutY="360.0" onAction="#handleModify" text="Modify" />
     </children>

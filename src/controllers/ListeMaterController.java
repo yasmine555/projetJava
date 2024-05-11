@@ -1,19 +1,18 @@
-package controllers;
-
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import models.Material;
-import DAO.data;
-
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.ResourceBundle;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
-public class ListeMaterController implements Initializable {
+import java.util.ArrayList;
+import java.util.List;
+import models.Material;
+
+public class ListeMaterController {
 
     @FXML
     private TableView<Material> materialTableView;
@@ -28,116 +27,49 @@ public class ListeMaterController implements Initializable {
     private TextField searchField;
 
     private ObservableList<Material> materialList;
-    private data materialData;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-        materialData = new data();
+        // Simulation de données
+        List<Material> dataList = new ArrayList<>();
+        dataList.add(new Material("Stéthoscope", 10));
+        dataList.add(new Material("Thermomètre", 20));
+        // Ajoutez d'autres matériaux ici...
 
-        try {
-            refreshMaterialList();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // Listener pour filtrer la liste lors de la saisie dans le champ de recherche
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filterMaterialList(newValue));
-    }
-
-    private void refreshMaterialList() throws SQLException {
-        materialList = FXCollections.observableArrayList();
-        materialList.addAll(materialData.getAllMaterials());
+        materialList = FXCollections.observableArrayList(dataList);
         materialTableView.setItems(materialList);
     }
 
-    private void filterMaterialList(String keyword) {
-        ObservableList<Material> filteredList = FXCollections.observableArrayList();
-
-        for (Material material : materialList) {
-            if (material.getName().toLowerCase().contains(keyword.toLowerCase())) {
-                filteredList.add(material);
-            }
-        }
-
-        materialTableView.setItems(filteredList);
+    @FXML
+    private void handleNewMaterial() throws IOException {
+        Stage stage = (Stage) materialTableView.getScene().getWindow();
+        App.showNewMaterial(stage);
     }
 
     @FXML
-    private void deleteSelectedMaterial() throws SQLException {
+    private void handleModifyMaterial() {
         Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-
         if (selectedMaterial != null) {
-            materialData.deleteMaterial(selectedMaterial.getName());
-            refreshMaterialList(); // Rafraîchir la liste après la suppression
+            Stage stage = (Stage) materialTableView.getScene().getWindow();
+            App.showModifyMaterial(stage);
         }
     }
 
     @FXML
-    private void updateMaterialQuantity() {
-        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-
-        if (selectedMaterial != null) {
-            TextInputDialog dialog = new TextInputDialog(String.valueOf(selectedMaterial.getQuantity()));
-            dialog.setTitle("Update Quantity");
-            dialog.setHeaderText("Enter new quantity for " + selectedMaterial.getName());
-            dialog.setContentText("New Quantity:");
-
-            dialog.showAndWait().ifPresent(newQuantity -> {
-                try {
-                    int quantity = Integer.parseInt(newQuantity);
-                    materialData.updateMaterialQuantity(selectedMaterial.getName(), quantity);
-                    refreshMaterialList(); // Rafraîchir la liste après la mise à jour
-                } catch (NumberFormatException | SQLException e) {
-                    e.printStackTrace();
+    private void handleSearch() {
+        String searchText = searchField.getText().trim().toLowerCase();
+        if (searchText.isEmpty()) {
+            materialTableView.setItems(materialList);
+        } else {
+            ObservableList<Material> filteredList = FXCollections.observableArrayList();
+            for (Material material : materialList) {
+                if (material.getName().toLowerCase().contains(searchText)) {
+                    filteredList.add(material);
                 }
-            });
-        }
-    }
-
-    @FXML
-    private void handleNewMaterial() {
-        // Code pour gérer l'ajout d'un nouveau matériau
-        // (ouvrir une fenêtre de dialogue pour saisir les détails du nouveau matériau, etc.)
-    }
-
-    @FXML
-    private void handleDelete() {
-        // Code pour gérer la suppression d'un matériau sélectionné
-        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-
-        if (selectedMaterial != null) {
-            try {
-                materialData.deleteMaterial(selectedMaterial.getName());
-                refreshMaterialList(); // Rafraîchir la liste après la suppression
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
-        }
-    }
-
-    @FXML
-    private void handleModify() {
-        // Code pour gérer la modification d'un matériau sélectionné
-        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-
-        if (selectedMaterial != null) {
-            TextInputDialog dialog = new TextInputDialog(String.valueOf(selectedMaterial.getQuantity()));
-            dialog.setTitle("Modify Material");
-            dialog.setHeaderText("Enter new details for " + selectedMaterial.getName());
-            dialog.setContentText("New Quantity:");
-
-            dialog.showAndWait().ifPresent(newQuantity -> {
-                try {
-                    int quantity = Integer.parseInt(newQuantity);
-                    materialData.updateMaterialQuantity(selectedMaterial.getName(), quantity);
-                    refreshMaterialList(); // Rafraîchir la liste après la mise à jour
-                } catch (NumberFormatException | SQLException e) {
-                    e.printStackTrace();
-                }
-            });
+            materialTableView.setItems(filteredList);
         }
     }
 }

@@ -1,10 +1,7 @@
 
 
-
 import DAO.data;
-import controllers.ListeMaterController;
-import controllers.LoginController;
-import controllers.newController;
+import controllers.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import javafx.application.Application;
@@ -101,5 +98,19 @@ public class App extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Ajouter un Matériel");
         primaryStage.show();
+    }
+        public static void showModifyMaterial(Stage primaryStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("/views/modify.fxml"));
+            loader.setController(new ModifyController());
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Modifier un Matériel");
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

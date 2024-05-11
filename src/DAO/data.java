@@ -8,6 +8,10 @@ import models.Material;
 public class data {
     private static final String DATABASE_URL = "jdbc:sqlite:data.db";
 
+    private static Connection getConnection() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private Connection dbconnect() throws SQLException {
         return DriverManager.getConnection(DATABASE_URL);
     }
@@ -57,16 +61,37 @@ public class data {
         return materials;
     }
 
-    public void updateMaterialQuantity(String name, int newQuantity) {
-        String sql = "UPDATE Material SET quantity = ? WHERE name = ?";
+    public static void updateMaterial(Material material) throws SQLException {
+        Connection connection = null;
+        PreparedStatement statement = null;
 
-        try (Connection conn = dbconnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, newQuantity);
-            pstmt.setString(2, name);
-            pstmt.executeUpdate();
+        try {
+            connection = data.getConnection();
+
+            String sql = "UPDATE materials SET name = ?, quantity = ? WHERE id = ?";
+            statement = connection.prepareStatement(sql);
+
+            // Définir les paramètres de la requête avec les nouvelles valeurs du matériau
+            statement.setString(1, material.getName());
+            statement.setInt(2, material.getQuantity());
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Material updated successfully.");
+            } else {
+                System.out.println("Failed to update material.");
+            }
         } catch (SQLException e) {
-            System.err.println("Error updating material quantity: " + e.getMessage());
+            System.err.println("Error updating material: " + e.getMessage());
+            throw e; // Rejeter l'exception pour être gérée par l'appelant
+        } finally {
+            // Fermer les ressources JDBC
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 
@@ -80,5 +105,9 @@ public class data {
         } catch (SQLException e) {
             System.err.println("Error deleting material: " + e.getMessage());
         }
+    }
+
+    public void updateMaterialQuantity(String name, int quantity) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
