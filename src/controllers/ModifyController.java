@@ -1,10 +1,10 @@
 package controllers;
 
+import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import models.Material;
-import DAO.data;
-import java.sql.SQLException;
+import DAO.DataDAO;
 
 public class ModifyController {
 
@@ -32,17 +32,22 @@ public class ModifyController {
     private void handleUpdateMaterial() {
         if (selectedMaterial != null) {
             String newName = newNameField.getText();
-            int newQuantity = Integer.parseInt(newQuantityField.getText());
-
-            selectedMaterial.setName(newName);
-            selectedMaterial.setQuantity(newQuantity);
+            String newQuantityText = newQuantityField.getText();
 
             try {
-                data.updateMaterial(selectedMaterial);
+                int newQuantity = Integer.parseInt(newQuantityText);
+
+                // Update material details
+                selectedMaterial.setName(newName);
+                selectedMaterial.setQuantity(newQuantity);
+
+                // Update material in the database
+                DataDAO dataDAO = new DataDAO();
+                dataDAO.updateMaterial(selectedMaterial);
 
                 System.out.println("Material updated successfully.");
-            } catch (SQLException e) {
-                System.err.println("Error updating material: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid quantity format: " + newQuantityText);
             }
         }
     }

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="400" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ModifyController">
+<AnchorPane id="AnchorPane" prefHeight="212.0" prefWidth="400" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="controllers.ModifyController">
     <children>
-        <Label layoutX="35" layoutY="25" text="Old Name:"/>
-        <Label layoutX="35" layoutY="65" text="New Name:"/>
-        <TextField fx:id="oldNameField" layoutX="150" layoutY="20" prefWidth="200"/>
-        <TextField fx:id="newNameField" layoutX="150" layoutY="60" prefWidth="200"/>
+        <Label layoutX="35" layoutY="25" text="Old Name:" />
+        <Label layoutX="35" layoutY="65" text="New Name:" />
+        <TextField fx:id="oldNameField" layoutX="150" layoutY="20" prefWidth="200" style="-fx-border-color: C4E4FF;" />
+        <TextField fx:id="newNameField" layoutX="150" layoutY="60" prefWidth="200" style="-fx-border-color: C4E4FF;" />
         
-        <Label layoutX="35" layoutY="105" text="Old Quantity:"/>
-        <Label layoutX="35" layoutY="145" text="New Quantity:"/>
-        <TextField fx:id="oldQuantityField" layoutX="150" layoutY="100" prefWidth="200"/>
-        <TextField fx:id="newQuantityField" layoutX="150" layoutY="140" prefWidth="200"/>
+        <Label layoutX="35" layoutY="105" text="Old Quantity:" />
+        <Label layoutX="35" layoutY="145" text="New Quantity:" />
+        <TextField fx:id="oldQuantityField" layoutX="150" layoutY="100" prefWidth="200" style="-fx-border-color: C4E4FF;" />
+        <TextField fx:id="newQuantityField" layoutX="150" layoutY="140" prefWidth="200" style="-fx-border-color: C4E4FF;" />
         
-        <Button layoutX="150" layoutY="180" text="Update Material" onAction="#handleUpdateMaterial"/>
+        <Button layoutX="192.0" layoutY="173.0" onAction="#handleUpdateMaterial" style="-fx-background-color: C4E4FF;" text="Update Material" />
     </children>
 </AnchorPane>

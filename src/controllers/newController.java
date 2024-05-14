@@ -1,23 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controllers;
 
-import java.net.URL;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import models.Material;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ResourceBundle;
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import models.Material; 
 
-/**
- *
- * @author HP-ELITEBOOK
- */
 public class newController {
     @FXML
     private TextField nameField;
@@ -25,7 +16,11 @@ public class newController {
     @FXML
     private TextField quantityField;
 
+    @FXML
+    private Button saveButton;
+
     private Connection conn;
+    private ListeMaterController listeMaterController;
 
     @FXML
     private void saveMaterial() {
@@ -33,7 +28,6 @@ public class newController {
         String quantityText = quantityField.getText().trim();
 
         if (name.isEmpty() || quantityText.isEmpty()) {
-            // Afficher un message d'erreur si des champs sont vides
             System.out.println("Veuillez remplir tous les champs.");
             return;
         }
@@ -42,7 +36,9 @@ public class newController {
             int quantity = Integer.parseInt(quantityText);
             Material newMaterial = new Material(name, quantity);
             insertMaterial(newMaterial);
-            clearFields(); // Effacer les champs après l'ajout
+            clearFields();
+            System.out.println("Nouveau matériau ajouté avec succès.");
+            listeMaterController.refreshMaterialList();
         } catch (NumberFormatException e) {
             System.out.println("Veuillez entrer une quantité valide.");
         }
@@ -55,7 +51,6 @@ public class newController {
             pstmt.setString(1, material.getName());
             pstmt.setInt(2, material.getQuantity());
             pstmt.executeUpdate();
-            System.out.println("Nouveau matériau ajouté avec succès.");
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'ajout du matériau : " + e.getMessage());
         }
@@ -69,6 +64,8 @@ public class newController {
     public void setConnection(Connection conn) {
         this.conn = conn;
     }
+
+    public void setListeMaterController(ListeMaterController listeMaterController) {
+        this.listeMaterController = listeMaterController;
+    }
 }
-
-

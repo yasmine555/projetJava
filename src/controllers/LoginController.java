@@ -1,59 +1,80 @@
 package controllers;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.Personnel;
+import DAO.DataDAO;
 
-public class LoginController implements Initializable {
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
+
+public class LoginController {
 
     @FXML
-    private TextField usernameField;
+    private TextField personnelIdField;
 
     @FXML
     private PasswordField passwordField;
 
-    private final List<Personnel> personnelList;
+    @FXML
+    private Button loginButton;
+
+    private DataDAO dataDAO;
 
     public LoginController() {
-        personnelList = new ArrayList<>();
-        personnelList.add(new Personnel(1, "john.jjj", "password123", "John", "jjj"));
-        personnelList.add(new Personnel(2, "jane.smith", "test456", "Jane", "Smith"));
-        personnelList.add(new Personnel(3, "alice.abc", "pass123", "Alice", "abc"));
-        personnelList.add(new Personnel(4, "bob.xxx", "test123", "Bob", "xxx"));
+        this.dataDAO = new DataDAO();
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }
     @FXML
-    private void handleLogin() throws IOException {
-        String username = usernameField.getText();
+    public void initialize() {
+    System.out.println("Contrôleur Login initialisé.");
+    }
+
+    @FXML
+    private void handleLogin() {
+        String personnelIdStr = personnelIdField.getText();
         String password = passwordField.getText();
 
-        if (username.equals("admin") && password.equals("admin")) {
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            App.showListeMater(stage);
-        } else {
-            System.out.println("Identifiants incorrects. Veuillez réessayer.");
+        try {
+            int personnelId = Integer.parseInt(personnelIdStr);
+
+            Personnel personnel = dataDAO.findPersonnelById(personnelId);
+
+            if (personnel != null && personnel.getPassword().equals(password)) {
+                openMainView();
+            } else {
+                System.out.println("Identifiants incorrects. Veuillez réessayer.");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("L'ID du personnel n'est pas un entier valide : " + personnelIdStr);
+        } catch (IOException e) {
+            System.err.println("Erreur d'accès à la base de données : " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Une erreur est survenue : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private Personnel findPersonnelByUsername(String username) {
-        for (Personnel personnel : personnelList) {
-            if (personnel.getUsername().equals(username)) {
-                return personnel;
-            }
-        }
-        return null;
+    private void openMainView() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vues/ListeMater.fxml"));
+        
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        Stage mainStage = new Stage();
+        mainStage.setScene(scene);
+        mainStage.setTitle("Liste des Matériaux");
+        String personnelIdStr = personnelIdField.getText();
+        System.out.println("ID du personnel saisi : " + personnelIdStr);
+
+        Stage loginStage = (Stage) personnelIdField.getScene().getWindow();
+        loginStage.close();
+
+        mainStage.show();
     }
 }
