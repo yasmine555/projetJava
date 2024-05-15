@@ -8,6 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.Personnel;
 import DAO.DataDAO;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
@@ -36,7 +38,7 @@ public class LoginController {
     }
 
     @FXML
-    private void handleLogin() {
+    private void handleLogin() throws IOException {
         String personnelIdStr = personnelIdField.getText();
         String password = passwordField.getText();
 
@@ -48,16 +50,18 @@ public class LoginController {
             if (personnel != null && personnel.getPassword().equals(password)) {
                 openMainView();
             } else {
-                System.out.println("Identifiants incorrects. Veuillez réessayer.");
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Erreur d'authentification");
+            alert.setHeaderText(null);
+            alert.setContentText("Identifiants incorrects. Veuillez réessayer.");
+            alert.showAndWait();
             }
         } catch (NumberFormatException e) {
-            System.err.println("L'ID du personnel n'est pas un entier valide : " + personnelIdStr);
-        } catch (IOException e) {
-            System.err.println("Erreur d'accès à la base de données : " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Une erreur est survenue : " + e.getMessage());
-            e.printStackTrace();
-        }
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Erreur d'identification");
+        alert.setHeaderText(null);
+        alert.setContentText("L'ID du personnel n'est pas valide : " + personnelIdStr);
+        alert.showAndWait();        }
     }
 
     private void openMainView() throws IOException {
@@ -78,3 +82,4 @@ public class LoginController {
         mainStage.show();
     }
 }
+

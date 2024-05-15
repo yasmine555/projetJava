@@ -40,6 +40,7 @@ public class ListeMaterController {
     private Button modifyButton;
 
     private ObservableList<Material> materialList;
+    private ObservableList<Material> filteredMaterialList;
 
     public void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -47,12 +48,18 @@ public class ListeMaterController {
 
         loadMaterialData(); 
 
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> handleSearch());
+        filteredMaterialList = FXCollections.observableArrayList(materialList);
+
+        materialTableView.setItems(filteredMaterialList);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            
+        filterMaterialList(newValue);
+        });
     }
 
     private void loadMaterialData() {
         List<Material> dataList = new ArrayList<>();
-        // Chargement des données de matériaux depuis la base de données ou une source de données
         dataList.add(new Material("Stéthoscope", 10));
         dataList.add(new Material("Thermomètre", 20));
         dataList.add(new Material("Bistouri", 15));
@@ -75,12 +82,28 @@ public class ListeMaterController {
         dataList.add(new Material("Filtre à particules", 30));
         dataList.add(new Material("Gouttes ophtalmiques", 55));
         dataList.add(new Material("Canule nasale", 25));
+        dataList.add(new Material("Bande élastique", 60));
+        dataList.add(new Material("Lampe frontale médicale", 12));
         dataList.add(new Material("Pince à épiler", 20));
 
         materialList = FXCollections.observableArrayList(dataList);
         materialTableView.setItems(materialList);
     }
+    
+        private void filterMaterialList(String searchText) {
+        String lowerCaseFilter = searchText.toLowerCase();
 
+        ObservableList<Material> filteredList = FXCollections.observableArrayList();
+
+        for (Material material : materialList) {
+            if (material.getName().toLowerCase().contains(lowerCaseFilter)) {
+                filteredList.add(material);
+            }
+        }
+
+        filteredMaterialList.setAll(filteredList);
+    }
+        
     @FXML
     private void handleNewMaterial() throws IOException {
         Stage stage = (Stage) materialTableView.getScene().getWindow();
@@ -88,24 +111,33 @@ public class ListeMaterController {
         refreshMaterialList(); 
     }
 
-    @FXML
-    private void handleModify() throws IOException {
-        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-        if (selectedMaterial != null) {
-            Stage stage = (Stage) materialTableView.getScene().getWindow();
-            DataDAO.showModifyMaterial(stage);
-            refreshMaterialList(); 
-        }
-    }
+@FXML
+private void handleModify() throws IOException {
+    Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
+    if (selectedMaterial != null) {
+        Stage stage = (Stage) materialTableView.getScene().getWindow();
+        DataDAO.showModifyMaterial(stage);
 
-    @FXML
-    private void handleDelete() {
-        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-        if (selectedMaterial != null) {
-            materialList.remove(selectedMaterial);
-            DataDAO.deleteMaterial(selectedMaterial);
-        }
+        refreshMaterialList();
     }
+}
+
+
+@FXML
+private void handleDelete() {
+    Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
+    if (selectedMaterial != null) {
+        // Supprimer le matériau de la liste observable
+        materialList.remove(selectedMaterial);
+        
+        // Supprimer le matériau de la base de données
+        DataDAO.deleteMaterial(selectedMaterial);
+
+        // Rafraîchir la TableView pour refléter les changements
+        materialTableView.refresh(); // Assurez-vous que la TableView est correctement rafraîchie
+    }
+}
+
 
     @FXML
     private void handleSearch() {
@@ -124,6 +156,7 @@ public class ListeMaterController {
     }
 
     void refreshMaterialList() {
-        loadMaterialData(); 
-    }
+    loadMaterialData(); 
+
+}
 }

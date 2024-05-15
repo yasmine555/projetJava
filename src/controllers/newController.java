@@ -4,12 +4,17 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import models.Material;
-
+import DAO.DataDAO;
+import static DAO.DataDAO.showPreviousInterface;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 
 public class newController {
+    @FXML
+    private ListeMaterController listeMaterController; 
     @FXML
     private TextField nameField;
 
@@ -20,7 +25,8 @@ public class newController {
     private Button saveButton;
 
     private Connection conn;
-    private ListeMaterController listeMaterController;
+    
+
 
     @FXML
     private void saveMaterial() {
@@ -28,7 +34,11 @@ public class newController {
         String quantityText = quantityField.getText().trim();
 
         if (name.isEmpty() || quantityText.isEmpty()) {
-            System.out.println("Veuillez remplir tous les champs.");
+            Alert emptyFieldsAlert = new Alert(Alert.AlertType.WARNING);
+            emptyFieldsAlert.setTitle("Champs Vides");
+            emptyFieldsAlert.setHeaderText(null);
+            emptyFieldsAlert.setContentText("Veuillez remplir tous les champs.");
+            emptyFieldsAlert.showAndWait();
             return;
         }
 
@@ -37,14 +47,36 @@ public class newController {
             Material newMaterial = new Material(name, quantity);
             insertMaterial(newMaterial);
             clearFields();
-            System.out.println("Nouveau matériau ajouté avec succès.");
-            listeMaterController.refreshMaterialList();
+
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Succès");
+            successAlert.setHeaderText(null);
+            successAlert.setContentText("Nouveau matériau ajouté avec succès.");
+            successAlert.showAndWait();
+
+            Stage stage = (Stage) saveButton.getScene().getWindow(); 
+            stage.close(); 
+            showPreviousInterface(stage, "/vues/ListeMater.fxml");
+
+            if (listeMaterController != null) {
+                listeMaterController.refreshMaterialList();
+            } else {
+                System.err.println("ListeMaterController non initialisé.");
+            } 
         } catch (NumberFormatException e) {
-            System.out.println("Veuillez entrer une quantité valide.");
+            Alert invalidQuantityAlert = new Alert(Alert.AlertType.ERROR);
+            invalidQuantityAlert.setTitle("Erreur");
+            invalidQuantityAlert.setHeaderText(null);
+            invalidQuantityAlert.setContentText("Veuillez entrer une quantité valide.");
+            invalidQuantityAlert.showAndWait();
         }
     }
 
     private void insertMaterial(Material material) {
+        if (conn == null) {
+            System.err.println("Connexion non initialisée.");
+            return;
+        }
         String sql = "INSERT INTO Material(name, quantity) VALUES (?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

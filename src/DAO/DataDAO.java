@@ -40,23 +40,25 @@ public class DataDAO {
         }
     }
 
-    public static void deleteMaterial(Material selectedMaterial) {
-        String sql = "DELETE FROM Materials WHERE name = ?";
+public static void deleteMaterial(Material selectedMaterial) {
+    String sql = "DELETE FROM Material WHERE name = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, selectedMaterial.getName());
-            int affectedRows = pstmt.executeUpdate();
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, selectedMaterial.getName());
+        int affectedRows = pstmt.executeUpdate();
 
-            if (affectedRows > 0) {
-                System.out.println("Matériau supprimé avec succès : " + selectedMaterial.getName());
-            } else {
-                System.out.println("Échec de la suppression du matériau.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la suppression du matériau : " + e.getMessage());
+        if (affectedRows > 0) {
+            System.out.println("Matériau supprimé avec succès : " + selectedMaterial.getName());
+        } else {
+            System.out.println("Aucun matériau supprimé.");
         }
+    } catch (SQLException e) {
+        System.err.println("Erreur lors de la suppression du matériau : " + e.getMessage());
+        e.printStackTrace(); // Afficher la trace complète de l'erreur pour le débogage
     }
+}
+
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DATABASE_URL);
     }
@@ -173,5 +175,17 @@ public class DataDAO {
 
     return null; 
 }
+    public static void showPreviousInterface(Stage stage, String previousFXML) {
+    try {
+        FXMLLoader loader = new FXMLLoader(DataDAO.class.getResource(previousFXML));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    } catch (IOException e) {
+        System.err.println("Erreur lors du chargement de l'interface précédente : " + e.getMessage());
+    }
+}
+
 
 }

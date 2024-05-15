@@ -14,7 +14,6 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vues/login.fxml"));
         Parent root = loader.load();
 
-        // Get the controller instance and call initialize method
         LoginController loginController = loader.getController();
         loginController.initialize();
 

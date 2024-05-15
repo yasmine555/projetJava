@@ -17,6 +17,6 @@
         <TextField fx:id="oldQuantityField" layoutX="150" layoutY="100" prefWidth="200" style="-fx-border-color: C4E4FF;" />
         <TextField fx:id="newQuantityField" layoutX="150" layoutY="140" prefWidth="200" style="-fx-border-color: C4E4FF;" />
         
-        <Button layoutX="192.0" layoutY="173.0" onAction="#handleUpdateMaterial" style="-fx-background-color: C4E4FF;" text="Update Material" />
+        <Button fx:id="update_material" layoutX="192.0" layoutY="173.0" onAction="#handleUpdateMaterial" style="-fx-background-color: C4E4FF;" text="Update Material" />
     </children>
 </AnchorPane>
