@@ -1,12 +1,12 @@
 package controllers;
 
-import java.sql.SQLException;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import models.Material;
-import DAO.DataDAO;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import models.Material;
+import DAO.DataDAO;
 
 public class ModifyController {
 
@@ -23,7 +23,7 @@ public class ModifyController {
 
     @FXML
     private TextField newQuantityField;
-    
+
     @FXML
     private Button update_material;
 
@@ -34,48 +34,52 @@ public class ModifyController {
     }
 
     @FXML
+    private void handleUpdateMaterial() {
+        if (selectedMaterial != null) {
+            String newName = newNameField.getText().trim();
+            String newQuantityText = newQuantityField.getText().trim();
 
-   private void handleUpdateMaterial() {
-    if (selectedMaterial != null) {
-        String newName = newNameField.getText().trim();
-        String newQuantityText = newQuantityField.getText().trim();
+            if (newName.isEmpty() || newQuantityText.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Champs manquants", "Veuillez remplir tous les champs.");
+                return;
+            }
 
-        if (newName.isEmpty() || newQuantityText.isEmpty()) {
-            Alert emptyFieldsAlert = new Alert(Alert.AlertType.WARNING);
-            emptyFieldsAlert.setTitle("Champs manquants");
-            emptyFieldsAlert.setHeaderText(null);
-            emptyFieldsAlert.setContentText("Veuillez remplir tous les champs.");
-            emptyFieldsAlert.showAndWait();
-            return;
-        }
+            try {
+                int newQuantity = Integer.parseInt(newQuantityText);
 
-        try {
-            int newQuantity = Integer.parseInt(newQuantityText);
+                // Mettre à jour les informations du matériel sélectionné
+                selectedMaterial.setName(newName);
+                selectedMaterial.setQuantity(newQuantity);
 
-            // Mettre à jour les informations du matériau sélectionné
-            selectedMaterial.setName(newName);
-            selectedMaterial.setQuantity(newQuantity);
+                // Appeler la méthode de mise à jour dans DataDAO
+                DataDAO dataDAO = new DataDAO();
+                dataDAO.updateMaterial(selectedMaterial);
 
-            DataDAO dataDAO = new DataDAO();
-            dataDAO.updateMaterial(selectedMaterial);
+                // Afficher un message de succès
+                showAlert(Alert.AlertType.INFORMATION, "Succès", "Matériau mis à jour avec succès.");
 
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("Succès");
-            successAlert.setHeaderText(null);
-            successAlert.setContentText("Matériau mis à jour avec succès.");
-            successAlert.showAndWait();
+                // Rafraîchir la TableView dans ListeMaterController
+                Stage stage = (Stage) update_material.getScene().getWindow();
+                ListeMaterController controller = DataDAO.showListeMater(stage);
+                if (controller != null) {
+                    controller.refreshMaterialList();
+                }
 
-            System.out.println("Material updated successfully.");
-        } catch (NumberFormatException e) {
-            Alert invalidQuantityAlert = new Alert(Alert.AlertType.ERROR);
-            invalidQuantityAlert.setTitle("Erreur");
-            invalidQuantityAlert.setHeaderText(null);
-            invalidQuantityAlert.setContentText("Veuillez entrer une quantité valide.");
-            invalidQuantityAlert.showAndWait();
+                // Fermer la fenêtre de modification
+                stage.close();
 
-            System.err.println("Invalid quantity format: " + newQuantityText);
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Veuillez entrer une quantité valide.");
+            }
         }
     }
-}
+
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 
 }

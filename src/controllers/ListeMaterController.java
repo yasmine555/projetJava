@@ -46,15 +46,13 @@ public class ListeMaterController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-        loadMaterialData(); 
+        loadMaterialData();
 
         filteredMaterialList = FXCollections.observableArrayList(materialList);
-
         materialTableView.setItems(filteredMaterialList);
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            
-        filterMaterialList(newValue);
+            filterMaterialList(newValue);
         });
     }
 
@@ -82,17 +80,14 @@ public class ListeMaterController {
         dataList.add(new Material("Filtre à particules", 30));
         dataList.add(new Material("Gouttes ophtalmiques", 55));
         dataList.add(new Material("Canule nasale", 25));
-        dataList.add(new Material("Bande élastique", 60));
-        dataList.add(new Material("Lampe frontale médicale", 12));
         dataList.add(new Material("Pince à épiler", 20));
 
         materialList = FXCollections.observableArrayList(dataList);
         materialTableView.setItems(materialList);
     }
-    
-        private void filterMaterialList(String searchText) {
-        String lowerCaseFilter = searchText.toLowerCase();
 
+    private void filterMaterialList(String searchText) {
+        String lowerCaseFilter = searchText.toLowerCase();
         ObservableList<Material> filteredList = FXCollections.observableArrayList();
 
         for (Material material : materialList) {
@@ -103,60 +98,43 @@ public class ListeMaterController {
 
         filteredMaterialList.setAll(filteredList);
     }
-        
+
     @FXML
     private void handleNewMaterial() throws IOException {
         Stage stage = (Stage) materialTableView.getScene().getWindow();
         DataDAO.showNewMaterial(stage);
-        refreshMaterialList(); 
-    }
-
-@FXML
-private void handleModify() throws IOException {
-    Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-    if (selectedMaterial != null) {
-        Stage stage = (Stage) materialTableView.getScene().getWindow();
-        DataDAO.showModifyMaterial(stage);
-
         refreshMaterialList();
     }
-}
 
-
-@FXML
-private void handleDelete() {
-    Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
-    if (selectedMaterial != null) {
-        // Supprimer le matériau de la liste observable
-        materialList.remove(selectedMaterial);
-        
-        // Supprimer le matériau de la base de données
-        DataDAO.deleteMaterial(selectedMaterial);
-
-        // Rafraîchir la TableView pour refléter les changements
-        materialTableView.refresh(); // Assurez-vous que la TableView est correctement rafraîchie
+    @FXML
+    private void handleModify() throws IOException {
+        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
+        if (selectedMaterial != null) {
+            Stage stage = (Stage) materialTableView.getScene().getWindow();
+            DataDAO.showModifyMaterial(stage);
+            refreshMaterialList();
+        }
     }
-}
 
+    @FXML
+    private void handleDelete() {
+        Material selectedMaterial = materialTableView.getSelectionModel().getSelectedItem();
+        if (selectedMaterial != null) {
+            materialList.remove(selectedMaterial);
+            filteredMaterialList.remove(selectedMaterial); 
+            DataDAO.deleteMaterial(selectedMaterial); 
+            materialTableView.refresh(); 
+        }
+    }
 
     @FXML
     private void handleSearch() {
         String searchText = searchField.getText().trim().toLowerCase();
-        if (searchText.isEmpty()) {
-            materialTableView.setItems(materialList);
-        } else {
-            ObservableList<Material> filteredList = FXCollections.observableArrayList();
-            for (Material material : materialList) {
-                if (material.getName().toLowerCase().contains(searchText)) {
-                    filteredList.add(material);
-                }
-            }
-            materialTableView.setItems(filteredList);
-        }
+        filterMaterialList(searchText);
     }
 
     void refreshMaterialList() {
-    loadMaterialData(); 
-
-}
+        loadMaterialData();
+        filterMaterialList(searchField.getText().trim().toLowerCase()); 
+    }
 }

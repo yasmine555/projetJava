@@ -1,5 +1,6 @@
 package DAO;
 
+import controllers.ListeMaterController;
 import java.io.IOException;
 import models.Material;
 import models.Personnel;
@@ -39,28 +40,24 @@ public class DataDAO {
             System.err.println("Erreur lors du chargement de new.fxml : " + e.getMessage());
         }
     }
-
-public static void deleteMaterial(Material selectedMaterial) {
-    String sql = "DELETE FROM Material WHERE name = ?";
-
-    try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        pstmt.setString(1, selectedMaterial.getName());
-        int affectedRows = pstmt.executeUpdate();
-
-        if (affectedRows > 0) {
-            System.out.println("Matériau supprimé avec succès : " + selectedMaterial.getName());
-        } else {
-            System.out.println("Aucun matériau supprimé.");
-        }
-    } catch (SQLException e) {
-        System.err.println("Erreur lors de la suppression du matériau : " + e.getMessage());
-        e.printStackTrace(); // Afficher la trace complète de l'erreur pour le débogage
-    }
-}
-
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DATABASE_URL);
+    }
+
+    public static ListeMaterController showListeMater(Stage stage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(DataDAO.class.getResource("vues/ListeMater.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+
+            return loader.getController(); // Retourne le contrôleur ListeMaterController
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void createMaterialTable() {
@@ -140,19 +137,37 @@ public static void deleteMaterial(Material selectedMaterial) {
         }
     }
 
+
     public void updateMaterial(Material selectedMaterial) {
-        String sql = "UPDATE Material SET quantity = ? WHERE name = ?";
+        String sql = "UPDATE Material SET quantity = ?, name = ? WHERE name = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, selectedMaterial.getQuantity());
             pstmt.setString(2, selectedMaterial.getName());
+            pstmt.setString(3, selectedMaterial.getName()); 
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error updating material", e);
         }
     }
+        public static void deleteMaterial(Material selectedMaterial) {
+        String sql = "DELETE FROM Material WHERE name = ?";
 
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, selectedMaterial.getName());
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                System.out.println("Matériau supprimé avec succès : " + selectedMaterial.getName());
+            } else {
+                System.out.println("Échec de la suppression du matériau.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la suppression du matériau : " + e.getMessage());
+        }
+    }
     public Personnel findPersonnelById(int personnelId) {
     String sql = "SELECT * FROM Personnel WHERE id = ?";
 
